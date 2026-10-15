@@ -10,7 +10,10 @@
     <string name="saved_devices">Saved devices:</string>
 
     <string name="setup_title">Make it work with all apps</string>
-    <string name="setup_text">Right now BT Volume works with apps that announce their playback, such as Spotify and YouTube Music. For all other apps (YouTube, browsers, podcasts…) it needs the DUMP permission. Android only lets you grant it from a computer: turn on USB debugging, connect the phone and run this command once:</string>
+    <string name="setup_text">Right now BT Volume works with apps that announce their playback, such as Spotify and YouTube Music. For all other apps (YouTube, browsers, podcasts…) it needs the DUMP permission, which Android only lets you grant through debugging. It takes about two minutes, once.</string>
+    <string name="setup_phone_button">Set up on this phone</string>
+    <string name="setup_phone_steps">1. If Developer options are off: Settings → About phone → tap Build number 7 times.\n2. Settings → System → Developer options → turn on Wireless debugging (Wi-Fi needed) and tap Pair device with pairing code.\n3. Keep the code on screen, pull down the notifications and type it into the BT Volume notification.\n4. When the notification says Done, you can turn Wireless debugging off.</string>
+    <string name="setup_computer">Or with a computer: turn on USB debugging, connect the phone and run once:</string>
     <string name="copy_command">Copy command</string>
     <string name="command_copied">Command copied</string>
     <string name="setup_guide">Setup guide</string>
@@ -23,6 +26,18 @@
     <string name="notification_device_basic">%1$s: %2$s (basic mode)</string>
     <string name="action_quieter">− Quieter</string>
     <string name="action_louder">+ Louder</string>
+
+    <string name="pairing_channel">Setup</string>
+    <string name="pairing_title">BT Volume setup</string>
+    <string name="pairing_text">In Wireless debugging, tap Pair device with pairing code, then type the 6-digit code here.</string>
+    <string name="pairing_enter_code">Enter pairing code</string>
+    <string name="pairing_code_label">6-digit code</string>
+    <string name="pairing_working">Pairing…</string>
+    <string name="pairing_done">Done. BT Volume now works with all apps. You can turn Wireless debugging off.</string>
+    <string name="pairing_failed">Setup failed: %1$s. Open Pair device with pairing code again and enter the new code.</string>
+    <string name="pairing_no_dialog">pairing code screen not found</string>
+    <string name="pairing_no_connection">could not connect to Wireless debugging</string>
+    <string name="pairing_not_granted">the permission was not granted</string>
 
     <string name="guide_url" translatable="false">https://github.com/jp-aibp/bt-volume#setup</string>
     <!-- Ko-fi page; the support button is hidden while this is empty. -->

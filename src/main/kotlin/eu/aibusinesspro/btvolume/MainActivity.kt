@@ -2,6 +2,7 @@ package eu.aibusinesspro.btvolume
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -16,6 +17,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import android.view.WindowInsets
@@ -181,6 +183,15 @@ class MainActivity : Activity() {
                 text = getString(R.string.setup_title)
             })
             addView(TextView(this@MainActivity).apply { text = getString(R.string.setup_text) })
+            addView(Button(this@MainActivity).apply {
+                text = getString(R.string.setup_phone_button)
+                setOnClickListener { startPhoneSetup() }
+            })
+            addView(TextView(this@MainActivity).apply { text = getString(R.string.setup_phone_steps) })
+            addView(TextView(this@MainActivity).apply {
+                setPadding(0, pad, 0, 0)
+                text = getString(R.string.setup_computer)
+            })
             addView(TextView(this@MainActivity).apply {
                 typeface = Typeface.MONOSPACE
                 setTextIsSelectable(true)
@@ -202,6 +213,18 @@ class MainActivity : Activity() {
                     setOnClickListener { open(getString(R.string.guide_url)) }
                 }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
             })
+        }
+    }
+
+    /** Posts the pairing-code notification and opens the settings page where the user continues. */
+    private fun startPhoneSetup() {
+        WirelessSetup.showPrompt(this)
+        val developerOptions = Settings.Global.getInt(contentResolver, Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1
+        val page = if (developerOptions) Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS else Settings.ACTION_DEVICE_INFO_SETTINGS
+        try {
+            startActivity(Intent(page))
+        } catch (e: ActivityNotFoundException) {
+            startActivity(Intent(Settings.ACTION_SETTINGS))
         }
     }
 

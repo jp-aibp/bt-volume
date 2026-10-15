@@ -104,6 +104,9 @@ class VolumeService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == WirelessSetup.ACTION_PAIRING_CODE) {
+            WirelessSetup.onCodeEntered(this, intent) { requestUpdate() }
+        }
         val current = currentBtDevice(this)
         if (current != null) {
             when (intent?.action) {

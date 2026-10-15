@@ -4,6 +4,10 @@ Per-device volume attenuation for Bluetooth audio on Android. Go quieter than th
 
 On many phones the lowest volume step is still too loud for some headphones, and the steps in between are coarse. BT Volume remembers an extra attenuation for each Bluetooth device and applies it automatically whenever that device connects.
 
+## Screenshots
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/setup.png" width="270" alt="BT Volume asking for the one-time setup">
+
 ## Features
 
 - Attenuation from 0 dB (no change) down to −40 dB, saved separately for each Bluetooth device
@@ -72,7 +76,9 @@ BT Volume has no internet permission. Its settings stay on the phone. The DUMP p
 
 BT Volume is free. If it helps you, you can support its development:
 
-<!-- Buy Me a Coffee link goes here -->
+[![Support me on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20BT%20Volume-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/jpaibp)
+
+The app also has a **Support the developer** button that opens the same page.
 
 ## Building
 

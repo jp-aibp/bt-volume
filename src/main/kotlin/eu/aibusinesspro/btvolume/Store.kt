@@ -57,3 +57,6 @@ fun savedDevices(context: Context): List<Pair<String, Float>> {
 }
 
 fun formatDb(db: Float): String = String.format(Locale.getDefault(), "%.1f dB", db)
+
+/** The slider step as text, with the decimal separator of the phone's language. */
+fun formatStep(): String = String.format(Locale.getDefault(), "%.1f", STEP_FINE)

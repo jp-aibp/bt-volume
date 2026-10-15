@@ -4,8 +4,8 @@
 
     <string name="status_no_device">Bluetooth zařízení není připojeno</string>
     <string name="status_connected">Připojeno: %1$s</string>
-    <string name="step_down">− 0,5 dB</string>
-    <string name="step_up">+ 0,5 dB</string>
+    <string name="step_down">− %1$s dB</string>
+    <string name="step_up">+ %1$s dB</string>
     <string name="help">Posuvník doprava = hlasitěji. 0 dB = beze změny, −40 dB = nejtišší.\nHodnota se ukládá pro každé Bluetooth zařízení zvlášť a použije se při jeho připojení.\nTlačítka v oznámení mění hlasitost po 1 dB i bez otevření aplikace.</string>
     <string name="saved_devices">Uložená zařízení:</string>
 

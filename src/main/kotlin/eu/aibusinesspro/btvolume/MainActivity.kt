@@ -124,11 +124,11 @@ class MainActivity : Activity() {
             })
         }
         quieter = Button(this).apply {
-            text = getString(R.string.step_down)
+            text = getString(R.string.step_down, formatStep())
             setOnClickListener { change(-STEP_FINE) }
         }
         louder = Button(this).apply {
-            text = getString(R.string.step_up)
+            text = getString(R.string.step_up, formatStep())
             setOnClickListener { change(STEP_FINE) }
         }
         val buttons = LinearLayout(this).apply {

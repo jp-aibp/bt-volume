@@ -4,8 +4,8 @@
 
     <string name="status_no_device">No Bluetooth device connected</string>
     <string name="status_connected">Connected: %1$s</string>
-    <string name="step_down">− 0.5 dB</string>
-    <string name="step_up">+ 0.5 dB</string>
+    <string name="step_down">− %1$s dB</string>
+    <string name="step_up">+ %1$s dB</string>
     <string name="help">Slider right = louder. 0 dB = no change, −40 dB = quietest.\nThe value is saved separately for each Bluetooth device and applied when it connects.\nThe notification buttons change the volume in 1 dB steps without opening the app.</string>
     <string name="saved_devices">Saved devices:</string>
 
@@ -25,6 +25,6 @@
     <string name="action_louder">+ Louder</string>
 
     <string name="guide_url" translatable="false">https://github.com/jp-aibp/bt-volume#setup</string>
-    <!-- Buy Me a Coffee page; the support button is hidden while this is empty. -->
-    <string name="support_url" translatable="false"></string>
+    <!-- Ko-fi page; the support button is hidden while this is empty. -->
+    <string name="support_url" translatable="false">https://ko-fi.com/jpaibp</string>
 </resources>

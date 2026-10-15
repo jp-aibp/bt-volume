@@ -6,7 +6,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
@@ -15,6 +18,7 @@ import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.AudioPlaybackConfiguration
+import android.media.audiofx.AudioEffect
 import android.media.audiofx.DynamicsProcessing
 import android.os.Build
 import android.os.Handler
@@ -30,6 +34,10 @@ import java.io.IOException
  * of every app that plays to the Bluetooth output, so it also goes below the lowest
  * system volume step. A single global effect (session 0) is not used: on Pixel with
  * Android 17 it does not reach tracks that are not spatialized.
+ *
+ * Sessions come from two sources: players that announce them with
+ * ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION (works without setup, e.g. Spotify), and
+ * `dumpsys media.audio_flinger` when the DUMP permission is granted (all apps).
  */
 class VolumeService : Service() {
 
@@ -39,9 +47,11 @@ class VolumeService : Service() {
 
     // Touched only on the worker thread.
     private val effects = mutableMapOf<Int, DynamicsProcessing>()
+    private val announced = mutableSetOf<Int>()
 
     @Volatile private var device: BtDevice? = null
     @Volatile private var error: String? = null
+    @Volatile private var basicMode = false
     private var retries = 0
 
     private val deviceCallback = object : AudioDeviceCallback() {
@@ -59,6 +69,20 @@ class VolumeService : Service() {
 
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> requestUpdate() }
 
+    // Runs on the worker thread (registered with its handler).
+    private val sessionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val session = intent.getIntExtra(AudioEffect.EXTRA_AUDIO_SESSION, 0)
+            if (session <= 0) return
+            when (intent.action) {
+                AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION -> announced += session
+                AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION -> announced -= session
+            }
+            retries = 0
+            update()
+        }
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -71,6 +95,12 @@ class VolumeService : Service() {
         // Calls onAudioDevicesAdded right away with the devices connected now.
         audio.registerAudioDeviceCallback(deviceCallback, handler)
         audio.registerAudioPlaybackCallback(playbackCallback, handler)
+        val filter = IntentFilter().apply {
+            addAction(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
+            addAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
+        }
+        // The players are other apps, so the receiver must be exported.
+        registerReceiver(sessionReceiver, filter, null, handler, if (Build.VERSION.SDK_INT >= 33) RECEIVER_EXPORTED else 0)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -90,6 +120,7 @@ class VolumeService : Service() {
         val audio = getSystemService(AudioManager::class.java)
         audio.unregisterAudioDeviceCallback(deviceCallback)
         audio.unregisterAudioPlaybackCallback(playbackCallback)
+        unregisterReceiver(sessionReceiver)
         prefs(this).unregisterOnSharedPreferenceChangeListener(prefsListener)
         handler.removeCallbacksAndMessages(null)
         handler.post { restoreAll() }
@@ -109,6 +140,7 @@ class VolumeService : Service() {
         device = currentBtDevice(this)
         val db = device?.let { getDb(this, it.key) } ?: 0f
         error = null
+        basicMode = checkSelfPermission(Manifest.permission.DUMP) != PackageManager.PERMISSION_GRANTED
         val failed = if (db >= 0f) restoreAll() else attenuateAll(db)
         // Right after the app restarts, the audio server may still refuse the effect left by the old process.
         if (failed && retries < MAX_RETRIES) {
@@ -120,7 +152,7 @@ class VolumeService : Service() {
 
     /** Returns true if some session could not be handled and should be tried again. */
     private fun attenuateAll(db: Float): Boolean {
-        val sessions = findSessions() ?: return false
+        val sessions = if (basicMode) announced.toSet() else (findSessions() ?: return false) + announced
         // Sessions that no longer play to Bluetooth (ended, or moved to the speaker) get their volume back.
         val failed = (attenuatedSessions() - sessions).filterNot(::restore) +
             sessions.filterNot { attenuate(it, db) }
@@ -138,10 +170,6 @@ class VolumeService : Service() {
     }
 
     private fun findSessions(): Set<Int>? {
-        if (checkSelfPermission(Manifest.permission.DUMP) != PackageManager.PERMISSION_GRANTED) {
-            error = getString(R.string.error_no_dump)
-            return null
-        }
         return try {
             bluetoothSessions()
         } catch (e: IOException) {
@@ -213,6 +241,7 @@ class VolumeService : Service() {
         val text = when {
             error != null -> getString(R.string.notification_error, error)
             current == null -> getString(R.string.status_no_device)
+            basicMode -> getString(R.string.notification_device_basic, current.name, formatDb(getDb(this, current.key)))
             else -> getString(R.string.notification_device, current.name, formatDb(getDb(this, current.key)))
         }
         val open = PendingIntent.getActivity(

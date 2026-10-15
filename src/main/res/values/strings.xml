@@ -9,8 +9,8 @@
     <string name="help">Slider right = louder. 0 dB = no change, −40 dB = quietest.\nThe value is saved separately for each Bluetooth device and applied when it connects.\nThe notification buttons change the volume in 1 dB steps without opening the app.</string>
     <string name="saved_devices">Saved devices:</string>
 
-    <string name="setup_title">One-time setup needed</string>
-    <string name="setup_text">To find the apps that are playing, BT Volume needs the DUMP permission. Android only lets you grant it from a computer: turn on USB debugging, connect the phone and run this command once:</string>
+    <string name="setup_title">Make it work with all apps</string>
+    <string name="setup_text">Right now BT Volume works with apps that announce their playback, such as Spotify and YouTube Music. For all other apps (YouTube, browsers, podcasts…) it needs the DUMP permission. Android only lets you grant it from a computer: turn on USB debugging, connect the phone and run this command once:</string>
     <string name="copy_command">Copy command</string>
     <string name="command_copied">Command copied</string>
     <string name="setup_guide">Setup guide</string>
@@ -20,7 +20,7 @@
     <string name="notification_title">Volume attenuation</string>
     <string name="notification_error">Attenuation not working: %1$s</string>
     <string name="notification_device">%1$s: %2$s</string>
-    <string name="error_no_dump">DUMP permission missing, open the app for setup</string>
+    <string name="notification_device_basic">%1$s: %2$s (basic mode)</string>
     <string name="action_quieter">− Quieter</string>
     <string name="action_louder">+ Louder</string>
 

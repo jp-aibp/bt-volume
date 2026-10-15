@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BT hlasitost</string>
+
+    <string name="status_no_device">Bluetooth zařízení není připojeno</string>
+    <string name="status_connected">Připojeno: %1$s</string>
+    <string name="step_down">− 0,5 dB</string>
+    <string name="step_up">+ 0,5 dB</string>
+    <string name="help">Posuvník doprava = hlasitěji. 0 dB = beze změny, −40 dB = nejtišší.\nHodnota se ukládá pro každé Bluetooth zařízení zvlášť a použije se při jeho připojení.\nTlačítka v oznámení mění hlasitost po 1 dB i bez otevření aplikace.</string>
+    <string name="saved_devices">Uložená zařízení:</string>
+
+    <string name="setup_title">Potřeba jednorázové nastavení</string>
+    <string name="setup_text">Aby BT hlasitost poznala, které aplikace hrají, potřebuje oprávnění DUMP. Android ho dovolí udělit jen z počítače: zapni ladění přes USB, připoj telefon a jednou spusť tento příkaz:</string>
+    <string name="copy_command">Zkopírovat příkaz</string>
+    <string name="command_copied">Příkaz zkopírován</string>
+    <string name="setup_guide">Návod</string>
+    <string name="support">Podpořit autora ☕</string>
+
+    <string name="channel_name">Útlum hlasitosti</string>
+    <string name="notification_title">Útlum hlasitosti</string>
+    <string name="notification_error">Ztlumení nefunguje: %1$s</string>
+    <string name="notification_device">%1$s: %2$s</string>
+    <string name="error_no_dump">chybí oprávnění DUMP, otevři aplikaci</string>
+    <string name="action_quieter">− Tišeji</string>
+    <string name="action_louder">+ Hlasitěji</string>
+</resources>

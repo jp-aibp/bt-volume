@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BT Volume</string>
+
+    <string name="status_no_device">No Bluetooth device connected</string>
+    <string name="status_connected">Connected: %1$s</string>
+    <string name="step_down">− 0.5 dB</string>
+    <string name="step_up">+ 0.5 dB</string>
+    <string name="help">Slider right = louder. 0 dB = no change, −40 dB = quietest.\nThe value is saved separately for each Bluetooth device and applied when it connects.\nThe notification buttons change the volume in 1 dB steps without opening the app.</string>
+    <string name="saved_devices">Saved devices:</string>
+
+    <string name="setup_title">One-time setup needed</string>
+    <string name="setup_text">To find the apps that are playing, BT Volume needs the DUMP permission. Android only lets you grant it from a computer: turn on USB debugging, connect the phone and run this command once:</string>
+    <string name="copy_command">Copy command</string>
+    <string name="command_copied">Command copied</string>
+    <string name="setup_guide">Setup guide</string>
+    <string name="support">Support the developer ☕</string>
+
+    <string name="channel_name">Volume attenuation</string>
+    <string name="notification_title">Volume attenuation</string>
+    <string name="notification_error">Attenuation not working: %1$s</string>
+    <string name="notification_device">%1$s: %2$s</string>
+    <string name="error_no_dump">DUMP permission missing, open the app for setup</string>
+    <string name="action_quieter">− Quieter</string>
+    <string name="action_louder">+ Louder</string>
+
+    <string name="guide_url" translatable="false">https://github.com/jp-aibp/bt-volume#setup</string>
+    <!-- Buy Me a Coffee page; the support button is hidden while this is empty. -->
+    <string name="support_url" translatable="false"></string>
+</resources>

@@ -240,7 +240,7 @@ class MainActivity : Activity() {
         // The pairing code is typed into a notification, so notifications must be allowed first.
         WirelessSetup.notificationSettingsIfBlocked(this)?.let { settings ->
             Toast.makeText(this, R.string.setup_needs_notifications, Toast.LENGTH_LONG).show()
-            startActivity(settings)
+            startActivity(settings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             return
         }
         WirelessSetup.showPrompt(this)

@@ -4,22 +4,20 @@ Per-device volume attenuation for Bluetooth audio on Android. Go quieter than th
 
 On many phones the lowest volume step is still too loud for some headphones, and the steps in between are coarse. BT Volume remembers an extra attenuation for each Bluetooth device and applies it automatically whenever that device connects.
 
-## Screenshots
-
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/setup.png" width="270" alt="BT Volume asking for the one-time setup">
-
 ## Features
 
 - Attenuation from 0 dB (no change) down to −40 dB, saved separately for each Bluetooth device
 - 0.5 dB steps in the app, 1 dB steps from the notification
 - Works on top of the normal volume buttons
-- No internet permission, no ads, no tracking
+- Works right away with players that announce their playback, such as Spotify and YouTube Music
+- One-time setup on the phone itself (no computer needed) to make it work with all other apps
+- No ads, no tracking
 - English and Czech
 
 ## Requirements
 
 - Android 12 or newer
-- A one-time setup from a computer to grant the DUMP permission (see [Setup](#setup))
+- For apps other than Spotify, YouTube Music and similar players: a one-time setup over Wi-Fi (see [Setup](#setup))
 
 Tested on a Pixel 10 Pro with Android 17. It should work on other phones too, but has not been tested there yet. If it does or does not work on your phone, please [open an issue](../../issues) with the phone model and Android version.
 
@@ -31,21 +29,32 @@ Tested on a Pixel 10 Pro with Android 17. It should work on other phones too, bu
 
 ## Setup
 
-Android has no public API that tells an app which other apps are playing audio. BT Volume reads this from the system audio dump, which needs the **DUMP** permission. Android only lets you grant it from a computer, once:
+Without setup, BT Volume works in **basic mode**: it attenuates players that announce their audio session to the system (Spotify, YouTube Music, Samsung Music and some others). Many apps do not do that, for example YouTube, browsers, podcast apps and most pre-installed players.
 
-1. On the phone, enable Developer options: **Settings → About phone →** tap **Build number** 7 times.
-2. Turn on **Settings → System → Developer options → USB debugging**.
-3. On the computer, install [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools) (it contains `adb`).
-4. Connect the phone with a USB cable and confirm **Allow USB debugging** on the phone.
-5. Run:
+For those, BT Volume needs the **DUMP** permission, which tells it which apps are playing. Android only lets you grant it through debugging, once. The app shows the setup box until it is done.
+
+### On the phone (recommended)
+
+Needs Wi-Fi.
+
+1. If Developer options are off: **Settings → About phone →** tap **Build number** 7 times.
+2. In BT Volume, tap **Set up on this phone**. It opens Developer options and shows a **BT Volume setup** notification.
+3. Turn on **Wireless debugging**, open it and tap **Pair device with pairing code**. Keep the code on screen.
+4. Pull down the notifications, tap **Enter pairing code** in the BT Volume notification and type the code.
+5. When the notification says **Done**, turn Wireless debugging off. You can also remove **BT Volume** from its list of paired devices.
+
+### With a computer
+
+1. Enable Developer options (see above) and turn on **Settings → System → Developer options → USB debugging**.
+2. On the computer, install [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools) (it contains `adb`).
+3. Connect the phone with a USB cable and confirm **Allow USB debugging** on the phone.
+4. Run:
 
    ```
    adb shell pm grant eu.aibusinesspro.btvolume android.permission.DUMP
    ```
 
-6. Open BT Volume. The setup box disappears once the permission is granted.
-
-The permission survives reboots and app updates. Uninstalling the app removes it. You can turn USB debugging off afterwards.
+Either way, the permission survives reboots and app updates. Uninstalling the app removes it.
 
 ## Usage
 
@@ -57,20 +66,24 @@ The permission survives reboots and app updates. Uninstalling the app removes it
 ## How it works
 
 - BT Volume attaches Android's `DynamicsProcessing` audio effect with a negative input gain to the audio session of every app that plays to the Bluetooth output.
-- It finds those sessions by reading `dumpsys media.audio_flinger`, which is why it needs the DUMP permission.
+- It learns those sessions from players that send `ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION` (basic mode) and, with the DUMP permission, by reading `dumpsys media.audio_flinger` (all apps).
 - It does not use a single global effect on the output mix (audio session 0). On Pixel phones with Android 17, audio that is not spatialized bypasses that global effect. That is also why the "legacy mode" of some equalizer apps has no effect there.
 - Android keeps an audio effect running with its last settings even after the app that created it lets go of it. BT Volume therefore always resets an effect to 0 dB before releasing it, including after the app was stopped by the system.
+- The setup on the phone uses [libadb-android](https://github.com/MuntashirAkon/libadb-android) to pair with the phone's own Wireless debugging and run exactly one command, `pm grant eu.aibusinesspro.btvolume android.permission.DUMP`. The key for this connection exists only in memory for that one attempt, so the app cannot connect again later.
 
 ## Limitations
 
 - Phone calls are not affected.
 - It can only make audio quieter, not louder.
 - When an app starts playing, the first fraction of a second can be at full level until the effect is attached.
+- Some phone makers block granting permissions through debugging (reported on some OnePlus phones). Then only basic mode works.
 - The format of the system audio dump can differ between phone makers and Android versions. If attenuation does not work on your phone, please open an issue.
 
 ## Privacy
 
-BT Volume has no internet permission. Its settings stay on the phone. The DUMP permission lets it read system diagnostic output; it uses only the list of audio sessions that play to Bluetooth.
+- No ads, no analytics, no data leaves the phone. Settings stay on the phone.
+- The **INTERNET** permission is needed only for the setup on the phone: Android requires it for any network connection, including the one to the phone's own Wireless debugging. BT Volume never connects to the internet.
+- The **DUMP** permission lets it read system diagnostic output; it uses only the list of audio sessions that play to Bluetooth.
 
 ## Support
 
@@ -92,4 +105,10 @@ Release builds are signed with a key that is not part of this repository.
 
 ## License
 
-[GNU General Public License v3.0](LICENSE)
+BT Volume is licensed under the [GNU General Public License v3.0](LICENSE).
+
+It uses:
+
+- [libadb-android](https://github.com/MuntashirAkon/libadb-android) (GPL-3.0-or-later or Apache-2.0)
+- [Conscrypt](https://github.com/google/conscrypt) (Apache-2.0)
+- [Bouncy Castle](https://www.bouncycastle.org/) ([MIT-style license](https://www.bouncycastle.org/licence.html))

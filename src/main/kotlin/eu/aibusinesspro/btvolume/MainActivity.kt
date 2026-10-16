@@ -219,12 +219,14 @@ class MainActivity : Activity() {
     /** Posts the pairing-code notification and opens the settings page where the user continues. */
     private fun startPhoneSetup() {
         WirelessSetup.showPrompt(this)
-        val developerOptions = Settings.Global.getInt(contentResolver, Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1
-        val page = if (developerOptions) Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS else Settings.ACTION_DEVICE_INFO_SETTINGS
-        try {
-            startActivity(Intent(page))
-        } catch (e: ActivityNotFoundException) {
-            startActivity(Intent(Settings.ACTION_SETTINGS))
+        // Developer options when they exist; otherwise About phone, where the user turns them on.
+        for (page in listOf(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS, Settings.ACTION_DEVICE_INFO_SETTINGS, Settings.ACTION_SETTINGS)) {
+            try {
+                startActivity(Intent(page))
+                return
+            } catch (e: ActivityNotFoundException) {
+                // Try the next page.
+            }
         }
     }
 

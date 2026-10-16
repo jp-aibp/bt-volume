@@ -44,6 +44,7 @@ class VolumeService : Service() {
     private val worker = HandlerThread("volume").apply { start() }
     private val handler = Handler(worker.looper)
     private val updateTask = Runnable { update() }
+    private val notificationTask = Runnable { showNotification() }
 
     // Touched only on the worker thread.
     private val effects = mutableMapOf<Int, DynamicsProcessing>()
@@ -78,6 +79,10 @@ class VolumeService : Service() {
                 AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION -> announced += session
                 AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION -> announced -= session
             }
+            // Players that die without closing their session would otherwise pile up.
+            while (announced.size > MAX_ANNOUNCED) announced.remove(announced.first())
+            // Kept so that a restarted app still knows the sessions of players that are already playing.
+            state().edit().putStringSet(KEY_ANNOUNCED, announced.map { it.toString() }.toSet()).apply()
             retries = 0
             update()
         }
@@ -100,6 +105,7 @@ class VolumeService : Service() {
             addAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
         }
         // The players are other apps, so the receiver must be exported.
+        announced += state().getStringSet(KEY_ANNOUNCED, emptySet())!!.mapNotNull { it.toIntOrNull() }
         registerReceiver(sessionReceiver, filter, null, handler, if (Build.VERSION.SDK_INT >= 33) RECEIVER_EXPORTED else 0)
     }
 
@@ -150,7 +156,10 @@ class VolumeService : Service() {
             retries++
             handler.postDelayed(updateTask, RETRY_DELAY_MS)
         }
-        showNotification()
+        // While the slider is dragged, update the notification only once it stops;
+        // Android drops notifications that are updated too often.
+        handler.removeCallbacks(notificationTask)
+        handler.postDelayed(notificationTask, NOTIFICATION_DELAY_MS)
     }
 
     /** Returns true if some session could not be handled and should be tried again. */
@@ -277,8 +286,11 @@ class VolumeService : Service() {
         const val TAG = "BtVolume"
         const val CHANNEL = "attenuation"
         const val KEY_SESSIONS = "sessions"
+        const val KEY_ANNOUNCED = "announced"
+        const val MAX_ANNOUNCED = 20
         const val MAX_RETRIES = 5
         const val RETRY_DELAY_MS = 2000L
+        const val NOTIFICATION_DELAY_MS = 400L
         const val NOTIFICATION_ID = 1
         const val PRIORITY = 100
         const val ACTION_LOUDER = "eu.aibusinesspro.btvolume.LOUDER"

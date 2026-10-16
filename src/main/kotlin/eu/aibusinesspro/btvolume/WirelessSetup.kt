@@ -92,18 +92,29 @@ object WirelessSetup {
 
     private fun grantDump(context: Context, code: String) {
         val pairing = findPairingService(context) ?: throw IOException(context.getString(R.string.pairing_no_dialog))
-        Adb().use { adb ->
+        var commandError: IOException? = null
+        val adb = Adb()
+        try {
             adb.pair(pairing.first, pairing.second, code)
             if (!adb.connectTls(context, TIMEOUT_MS)) throw IOException(context.getString(R.string.pairing_no_connection))
-            adb.openStream("shell:pm grant ${context.packageName} ${Manifest.permission.DUMP}").use { stream ->
-                val output = stream.openInputStream().bufferedReader().readText().trim()
-                if (output.isNotEmpty()) Log.i(TAG, "pm grant: $output")
+            try {
+                adb.openStream("shell:pm grant ${context.packageName} ${Manifest.permission.DUMP}").use { stream ->
+                    val output = stream.openInputStream().bufferedReader().readText().trim()
+                    if (output.isNotEmpty()) Log.i(TAG, "pm grant: $output")
+                }
+            } catch (e: IOException) {
+                // adbd may close the stream as soon as the command ends ("Stream closed"); the check below decides.
+                commandError = e
             }
-            adb.disconnect()
+        } finally {
+            runCatching { adb.close() }
         }
-        if (context.checkSelfPermission(Manifest.permission.DUMP) != PackageManager.PERMISSION_GRANTED) {
-            throw IOException(context.getString(R.string.pairing_not_granted))
+        // The grant can take a moment to show up.
+        repeat(10) {
+            if (context.checkSelfPermission(Manifest.permission.DUMP) == PackageManager.PERMISSION_GRANTED) return
+            Thread.sleep(300)
         }
+        throw commandError ?: IOException(context.getString(R.string.pairing_not_granted))
     }
 
     /**

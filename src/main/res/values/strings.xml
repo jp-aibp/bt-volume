@@ -2,15 +2,15 @@
 <resources>
     <string name="app_name">BT Volume</string>
 
-    <string name="status_no_device">No Bluetooth device connected</string>
+    <string name="status_no_device">Media is not playing to a Bluetooth device</string>
     <string name="status_connected">Connected: %1$s</string>
     <string name="step_down">− %1$s dB</string>
     <string name="step_up">+ %1$s dB</string>
     <string name="help">Slider right = louder. 0 dB = no change, −40 dB = quietest.\nThe value is saved separately for each Bluetooth device and applied when it connects.\nThe notification buttons change the volume in 1 dB steps without opening the app.</string>
     <string name="saved_devices">Saved devices:</string>
 
-    <string name="setup_title">Make it work with all apps</string>
-    <string name="setup_text">Right now BT Volume works with apps that announce their playback, such as Spotify and YouTube Music. For all other apps (YouTube, browsers, podcasts…) it needs the DUMP permission, which Android only lets you grant through debugging. It takes about two minutes, once.</string>
+    <string name="setup_title">Make it work with other apps</string>
+    <string name="setup_text">Right now BT Volume works with apps that announce their playback, such as Spotify and YouTube Music. For other apps (YouTube, browsers, podcasts…) it needs the DUMP permission, which Android only lets you grant through debugging. It takes about two minutes, once.</string>
     <string name="setup_phone_button">Set up on this phone</string>
     <string name="setup_phone_steps">1. If Developer options are off: Settings → About phone → tap Build number 7 times.\n2. Settings → System → Developer options → turn on Wireless debugging (Wi-Fi needed) and tap Pair device with pairing code.\n3. Keep the code on screen, pull down the notifications and type it into the BT Volume notification.\n4. When the notification says Done, you can turn Wireless debugging off.</string>
     <string name="setup_computer">Or with a computer: turn on USB debugging, connect the phone and run once:</string>
@@ -18,6 +18,11 @@
     <string name="command_copied">Command copied</string>
     <string name="setup_guide">Setup guide</string>
     <string name="support">Support the developer ☕</string>
+    <string name="licenses">Open-source licenses</string>
+    <string name="setup_needs_notifications">Allow notifications for BT Volume first: the pairing code is entered in a notification.</string>
+    <string name="warning_not_applied">Not applied: the audio effect could not be attached.</string>
+    <string name="warning_needs_setup">Not applied to the app that is playing: it needs the one-time setup.</string>
+    <string name="notification_warning">%1$s: %2$s – %3$s</string>
 
     <string name="channel_name">Volume attenuation</string>
     <string name="notification_title">Volume attenuation</string>
@@ -33,7 +38,7 @@
     <string name="pairing_enter_code">Enter pairing code</string>
     <string name="pairing_code_label">6-digit code</string>
     <string name="pairing_working">Pairing…</string>
-    <string name="pairing_done">Done. BT Volume now works with all apps. You can turn Wireless debugging off.</string>
+    <string name="pairing_done">Done. BT Volume now also works with other apps. You can turn Wireless debugging off.</string>
     <string name="pairing_failed">Setup failed: %1$s. Open Pair device with pairing code again and enter the new code.</string>
     <string name="pairing_no_dialog">pairing code screen not found</string>
     <string name="pairing_no_connection">could not connect to Wireless debugging</string>

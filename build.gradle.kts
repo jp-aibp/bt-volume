@@ -16,8 +16,8 @@ android {
         applicationId = "eu.aibusinesspro.btvolume"
         minSdk = 31
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         // Conscrypt and SPAKE2 ship native code; almost all current phones are ARM.
         ndk {

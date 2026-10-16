@@ -2,6 +2,7 @@ package eu.aibusinesspro.btvolume
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -33,6 +34,7 @@ class MainActivity : Activity() {
 
     private lateinit var status: TextView
     private lateinit var value: TextView
+    private lateinit var warning: TextView
     private lateinit var slider: SeekBar
     private lateinit var quieter: Button
     private lateinit var louder: Button
@@ -66,6 +68,7 @@ class MainActivity : Activity() {
     override fun onStart() {
         super.onStart()
         prefs(this).registerOnSharedPreferenceChangeListener(prefsListener)
+        statePrefs(this).registerOnSharedPreferenceChangeListener(prefsListener)
         getSystemService(AudioManager::class.java)
             .registerAudioDeviceCallback(deviceCallback, Handler(Looper.getMainLooper()))
         refresh()
@@ -73,6 +76,7 @@ class MainActivity : Activity() {
 
     override fun onStop() {
         prefs(this).unregisterOnSharedPreferenceChangeListener(prefsListener)
+        statePrefs(this).unregisterOnSharedPreferenceChangeListener(prefsListener)
         getSystemService(AudioManager::class.java).unregisterAudioDeviceCallback(deviceCallback)
         super.onStop()
     }
@@ -95,6 +99,10 @@ class MainActivity : Activity() {
             value.text = formatDb(db)
             slider.progress = ((db - MIN_DB) / STEP_FINE).roundToInt()
         }
+        // The saved value is only a setting; this says when it is not actually applied.
+        val notApplied = if (current == null) "" else currentWarning(this)
+        warning.text = notApplied
+        warning.visibility = if (notApplied.isEmpty()) View.GONE else View.VISIBLE
         val list = savedDevices(this)
         saved.text = if (list.isEmpty()) "" else
             getString(R.string.saved_devices) + "\n" + list.joinToString("\n") { (name, db) -> "• $name: ${formatDb(db)}" }
@@ -109,6 +117,12 @@ class MainActivity : Activity() {
         val pad = (16 * resources.displayMetrics.density).roundToInt()
 
         status = TextView(this).apply { textSize = 18f }
+        warning = TextView(this).apply {
+            textSize = 16f
+            gravity = Gravity.CENTER
+            setTextColor(0xFFE69500.toInt())
+            setPadding(0, 0, 0, pad)
+        }
         value = TextView(this).apply {
             textSize = 44f
             gravity = Gravity.CENTER
@@ -150,6 +164,7 @@ class MainActivity : Activity() {
             addView(setup)
             addView(status)
             addView(value)
+            addView(warning)
             addView(slider)
             addView(buttons)
             addView(help)
@@ -161,6 +176,10 @@ class MainActivity : Activity() {
                     setOnClickListener { open(supportUrl) }
                 })
             }
+            addView(Button(this@MainActivity).apply {
+                text = getString(R.string.licenses)
+                setOnClickListener { showLicenses() }
+            })
         }
         return ScrollView(this).apply {
             addView(column)
@@ -218,6 +237,12 @@ class MainActivity : Activity() {
 
     /** Posts the pairing-code notification and opens the settings page where the user continues. */
     private fun startPhoneSetup() {
+        // The pairing code is typed into a notification, so notifications must be allowed first.
+        WirelessSetup.notificationSettingsIfBlocked(this)?.let { settings ->
+            Toast.makeText(this, R.string.setup_needs_notifications, Toast.LENGTH_LONG).show()
+            startActivity(settings)
+            return
+        }
         WirelessSetup.showPrompt(this)
         // Developer options when they exist; otherwise About phone, where the user turns them on.
         for (page in listOf(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS, Settings.ACTION_DEVICE_INFO_SETTINGS, Settings.ACTION_SETTINGS)) {
@@ -229,6 +254,21 @@ class MainActivity : Activity() {
                 // Try the next page.
             }
         }
+    }
+
+    private fun showLicenses() {
+        val text = assets.open("THIRD_PARTY_NOTICES.txt").bufferedReader().use { it.readText() }
+        val pad = (16 * resources.displayMetrics.density).roundToInt()
+        val view = ScrollView(this).apply {
+            addView(TextView(this@MainActivity).apply {
+                typeface = Typeface.MONOSPACE
+                textSize = 11f
+                setPadding(pad, pad, pad, pad)
+                setTextIsSelectable(true)
+                this.text = text
+            })
+        }
+        AlertDialog.Builder(this).setTitle(R.string.licenses).setView(view).setPositiveButton(android.R.string.ok, null).show()
     }
 
     private fun open(url: String) {

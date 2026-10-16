@@ -13,6 +13,7 @@ import android.graphics.drawable.Icon
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import io.github.muntashirakon.adb.AbsAdbConnectionManager
 import org.bouncycastle.asn1.x500.X500Name
@@ -52,6 +53,21 @@ object WirelessSetup {
     private const val PAIRING_SERVICE = "_adb-tls-pairing._tcp"
 
     private val running = AtomicBoolean(false)
+
+    /** The settings page to open when the setup notification cannot be shown, or null when it can. */
+    fun notificationSettingsIfBlocked(context: Context): Intent? {
+        val manager = context.getSystemService(NotificationManager::class.java)
+        if (!manager.areNotificationsEnabled()) {
+            return Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        }
+        if (manager.getNotificationChannel(CHANNEL)?.importance == NotificationManager.IMPORTANCE_NONE) {
+            return Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                .putExtra(Settings.EXTRA_CHANNEL_ID, CHANNEL)
+        }
+        return null
+    }
 
     /** Shows the notification where the user types the pairing code. */
     fun showPrompt(context: Context, message: String = context.getString(R.string.pairing_text)) {

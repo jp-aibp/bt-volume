@@ -150,26 +150,45 @@ class VolumeService : Service() {
         val db = device?.let { getDb(this, it.key) } ?: 0f
         error = null
         basicMode = checkSelfPermission(Manifest.permission.DUMP) != PackageManager.PERMISSION_GRANTED
-        val failed = if (db >= 0f) restoreAll() else attenuateAll(db)
+        var warning = ""
+        val failed = if (db >= 0f) {
+            restoreAll()
+        } else {
+            val (failed, targets) = attenuateAll(db)
+            warning = when {
+                failed && retries >= MAX_RETRIES -> getString(R.string.warning_not_applied)
+                // Something plays, but no player announced itself: in basic mode that app is not covered.
+                basicMode && targets == 0 && getSystemService(AudioManager::class.java).isMusicActive ->
+                    getString(R.string.warning_needs_setup)
+                else -> ""
+            }
+            failed
+        }
         // Right after the app restarts, the audio server may still refuse the effect left by the old process.
         if (failed && retries < MAX_RETRIES) {
             retries++
             handler.postDelayed(updateTask, RETRY_DELAY_MS)
         }
+        if (currentWarning(this) != warning) state().edit().putString(KEY_WARNING, warning).apply()
         // While the slider is dragged, update the notification only once it stops;
         // Android drops notifications that are updated too often.
         handler.removeCallbacks(notificationTask)
         handler.postDelayed(notificationTask, NOTIFICATION_DELAY_MS)
     }
 
-    /** Returns true if some session could not be handled and should be tried again. */
-    private fun attenuateAll(db: Float): Boolean {
-        val sessions = if (basicMode) announced.toSet() else (findSessions() ?: return false) + announced
+    /**
+     * Returns whether some session could not be handled and should be tried again, and how many
+     * sessions should be attenuated. Only called while media plays to a Bluetooth output.
+     */
+    private fun attenuateAll(db: Float): Pair<Boolean, Int> {
+        // With DUMP, only sessions that really play to Bluetooth (not the ones moved to the speaker).
+        // Without it, the sessions the players announced; their route cannot be checked one by one.
+        val sessions = if (basicMode) announced.toSet() else findSessions() ?: return false to 0
         // Sessions that no longer play to Bluetooth (ended, or moved to the speaker) get their volume back.
         val failed = (attenuatedSessions() - sessions).filterNot(::restore) +
             sessions.filterNot { attenuate(it, db) }
         saveAttenuatedSessions(effects.keys + failed)
-        return failed.isNotEmpty()
+        return failed.isNotEmpty() to sessions.size
     }
 
     /** Returns true if some session could not be handled and should be tried again. */
@@ -236,8 +255,7 @@ class VolumeService : Service() {
         state().edit().putStringSet(KEY_SESSIONS, sessions.map { it.toString() }.toSet()).apply()
     }
 
-    // Separate from the volume prefs, whose changes trigger an update.
-    private fun state() = getSharedPreferences("state", MODE_PRIVATE)
+    private fun state() = statePrefs(this)
 
     private fun config() = DynamicsProcessing.Config.Builder(
         DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
@@ -253,6 +271,8 @@ class VolumeService : Service() {
         val text = when {
             error != null -> getString(R.string.notification_error, error)
             current == null -> getString(R.string.status_no_device)
+            currentWarning(this).isNotEmpty() ->
+                getString(R.string.notification_warning, current.name, formatDb(getDb(this, current.key)), currentWarning(this))
             basicMode -> getString(R.string.notification_device_basic, current.name, formatDb(getDb(this, current.key)))
             else -> getString(R.string.notification_device, current.name, formatDb(getDb(this, current.key)))
         }

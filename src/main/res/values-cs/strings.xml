@@ -2,15 +2,15 @@
 <resources>
     <string name="app_name">BT hlasitost</string>
 
-    <string name="status_no_device">Bluetooth zařízení není připojeno</string>
+    <string name="status_no_device">Média nehrají do Bluetooth zařízení</string>
     <string name="status_connected">Připojeno: %1$s</string>
     <string name="step_down">− %1$s dB</string>
     <string name="step_up">+ %1$s dB</string>
     <string name="help">Posuvník doprava = hlasitěji. 0 dB = beze změny, −40 dB = nejtišší.\nHodnota se ukládá pro každé Bluetooth zařízení zvlášť a použije se při jeho připojení.\nTlačítka v oznámení mění hlasitost po 1 dB i bez otevření aplikace.</string>
     <string name="saved_devices">Uložená zařízení:</string>
 
-    <string name="setup_title">Aby to fungovalo se všemi aplikacemi</string>
-    <string name="setup_text">Teď BT hlasitost funguje s aplikacemi, které ohlašují přehrávání, například Spotify a YouTube Music. Pro všechny ostatní (YouTube, prohlížeče, podcasty…) potřebuje oprávnění DUMP, které Android dovolí udělit jen přes ladění. Jednorázově to zabere asi dvě minuty.</string>
+    <string name="setup_title">Aby to fungovalo i s dalšími aplikacemi</string>
+    <string name="setup_text">Teď BT hlasitost funguje s aplikacemi, které ohlašují přehrávání, například Spotify a YouTube Music. Pro ostatní (YouTube, prohlížeče, podcasty…) potřebuje oprávnění DUMP, které Android dovolí udělit jen přes ladění. Jednorázově to zabere asi dvě minuty.</string>
     <string name="setup_phone_button">Nastavit v tomto telefonu</string>
     <string name="setup_phone_steps">1. Pokud nemáš zapnuté možnosti pro vývojáře: Nastavení → Informace o telefonu → 7× klepni na Číslo sestavení.\n2. Nastavení → Systém → Pro vývojáře → zapni Bezdrátové ladění (potřeba Wi-Fi) a klepni na Párovat zařízení pomocí párovacího kódu.\n3. Nech kód na obrazovce, stáhni oznámení a opiš ho do oznámení BT hlasitosti.\n4. Až oznámení napíše Hotovo, můžeš Bezdrátové ladění vypnout.</string>
     <string name="setup_computer">Nebo s počítačem: zapni ladění přes USB, připoj telefon a jednou spusť:</string>
@@ -18,6 +18,11 @@
     <string name="command_copied">Příkaz zkopírován</string>
     <string name="setup_guide">Návod</string>
     <string name="support">Podpořit autora ☕</string>
+    <string name="licenses">Licence open source</string>
+    <string name="setup_needs_notifications">Nejdřív povol BT hlasitosti oznámení: párovací kód se zadává v oznámení.</string>
+    <string name="warning_not_applied">Nepoužito: zvukový efekt se nepodařilo připojit.</string>
+    <string name="warning_needs_setup">Na hrající aplikaci se nepoužilo: potřebuje jednorázové nastavení.</string>
+    <string name="notification_warning">%1$s: %2$s – %3$s</string>
 
     <string name="channel_name">Útlum hlasitosti</string>
     <string name="notification_title">Útlum hlasitosti</string>
@@ -33,7 +38,7 @@
     <string name="pairing_enter_code">Zadat párovací kód</string>
     <string name="pairing_code_label">Šestimístný kód</string>
     <string name="pairing_working">Páruji…</string>
-    <string name="pairing_done">Hotovo. BT hlasitost teď funguje se všemi aplikacemi. Bezdrátové ladění můžeš vypnout.</string>
+    <string name="pairing_done">Hotovo. BT hlasitost teď funguje i s dalšími aplikacemi. Bezdrátové ladění můžeš vypnout.</string>
     <string name="pairing_failed">Nastavení selhalo: %1$s. Otevři znovu Párovat zařízení pomocí párovacího kódu a zadej nový kód.</string>
     <string name="pairing_no_dialog">obrazovka s párovacím kódem nenalezena</string>
     <string name="pairing_no_connection">nepodařilo se připojit k Bezdrátovému ladění</string>

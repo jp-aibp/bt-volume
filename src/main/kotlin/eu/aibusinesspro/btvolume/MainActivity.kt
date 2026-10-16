@@ -57,7 +57,6 @@ class MainActivity : Activity() {
         ) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
         }
-        startForegroundService(Intent(this, VolumeService::class.java))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -71,6 +70,9 @@ class MainActivity : Activity() {
         statePrefs(this).registerOnSharedPreferenceChangeListener(prefsListener)
         getSystemService(AudioManager::class.java)
             .registerAudioDeviceCallback(deviceCallback, Handler(Looper.getMainLooper()))
+        // Starts the service, or makes it look again: permissions may have changed while the app was closed
+        // (for example DUMP granted from a computer), and the warning shown below must match.
+        startForegroundService(Intent(this, VolumeService::class.java))
         refresh()
     }
 

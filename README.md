@@ -71,6 +71,8 @@ Needs Wi-Fi.
    adb shell pm grant eu.aibusinesspro.btvolume android.permission.DUMP
    ```
 
+5. Open BT Volume. The setup box disappears.
+
 Either way, the permission survives reboots and app updates. Uninstalling the app removes it.
 
 ## Usage

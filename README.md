@@ -4,6 +4,10 @@ Per-device volume attenuation for Bluetooth audio on Android. Go quieter than th
 
 On many phones the lowest volume step is still too loud for some headphones, and the steps in between are coarse. BT Volume remembers an extra attenuation for each Bluetooth device and applies it automatically whenever that device connects.
 
+## Screenshots
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/main.png" width="270" alt="BT Volume main screen with a saved attenuation per Bluetooth device"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/setup.png" width="270" alt="BT Volume one-time setup box">
+
 ## Features
 
 - Attenuation from 0 dB (no change) down to −40 dB, saved separately for each Bluetooth device

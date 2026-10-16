@@ -222,7 +222,8 @@ class MainActivity : Activity() {
         // Developer options when they exist; otherwise About phone, where the user turns them on.
         for (page in listOf(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS, Settings.ACTION_DEVICE_INFO_SETTINGS, Settings.ACTION_SETTINGS)) {
             try {
-                startActivity(Intent(page))
+                // A separate task, so that opening BT Volume later shows the app and not Settings.
+                startActivity(Intent(page).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 return
             } catch (e: ActivityNotFoundException) {
                 // Try the next page.
